@@ -14,6 +14,7 @@ namespace logsHandler
             Console.WriteLine("kdfjklfjllsds");
             Console.WriteLine("fkjdklfdl");
             Console.WriteLine("blabla");
+            Console.WriteLine("blablaV2.0");
         }
     }
 }
