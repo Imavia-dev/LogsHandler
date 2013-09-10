@@ -10,6 +10,7 @@ namespace logsHandler
     {
         static void Main(string[] args)
         {
+            Console.WriteLine("kljljkljl");
         }
     }
 }
