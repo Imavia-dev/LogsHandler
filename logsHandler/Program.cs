@@ -12,6 +12,7 @@ namespace logsHandler
         {
             Console.WriteLine("kljljkljl");
             Console.WriteLine("kdfjklfjllsds");
+            Console.WriteLine("fkjdklfdl");
         }
     }
 }
