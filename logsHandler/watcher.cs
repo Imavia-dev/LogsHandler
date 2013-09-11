@@ -19,7 +19,7 @@ namespace logsHandler
             Console.WriteLine("Nouveau FileSystemWatcher générer !");
 
             // Chemin du dossier a surveiller
-            watcher.Path = @"C:\fsw";
+            watcher.Path = "@" + CheckParameter.watchDirectory;
 
             Console.WriteLine("Chemin surveillé : " + watcher.Path);
             
@@ -27,10 +27,10 @@ namespace logsHandler
             watcher.NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.DirectoryName ;
 
             // Inclusion des sous-dossiers
-            watcher.IncludeSubdirectories = true;
+            watcher.IncludeSubdirectories = CheckParameter.includeSubdirectories;
 
             // Type de fichier a rechercher
-            watcher.Filter = "*.*";
+            watcher.Filter = CheckParameter.extensionFilter;
 
             Console.WriteLine("Type de fichiers surveillés : " + watcher.Filter);
 
@@ -41,7 +41,6 @@ namespace logsHandler
             watcher.EnableRaisingEvents = true;
 
             Console.WriteLine("Appuyez sur \'q\' puis entrée pour quitter l'application");
-            //while (Console.Read() != 'q') ;
         }
 
         private static void OnStateChange(object source, FileSystemEventArgs e)
