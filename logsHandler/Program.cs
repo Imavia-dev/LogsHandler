@@ -12,17 +12,17 @@ namespace logsHandler
 
         static void Main(string[] args)
         {
-            if (args.Length>0) {
+         
 
-                CheckParameter.checkArguments(args);        
-                watcher.startWatcher();
-            }
-            while (Console.Read()!='q')
-            {
-                
-            }
-        
-            
-       }
+                bool error = CheckParameter.checkArguments(args);
+                if (!error)
+                {
+                    watcher.startWatcher();
+                    while (Console.Read() != 'q')
+                    {
+
+                    }
+                }
+          }
     }
 }
