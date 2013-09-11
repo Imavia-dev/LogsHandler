@@ -7,13 +7,9 @@ using System.Threading.Tasks;
 
 namespace logsHandler
 {
-    class Program
+    class watcher
     {
-        static void Main(string[] args)
-        {
-            startWatcher();
-        }
-
+   
         public static void startWatcher() 
         {
             Console.WriteLine("Application console logsHandler en cours de démarrage…");
@@ -23,12 +19,12 @@ namespace logsHandler
             Console.WriteLine("Nouveau FileSystemWatcher générer !");
 
             // Chemin du dossier a surveiller
-            watcher.Path = @"C:\Users\Sebastien.FORMAGRAPH\Desktop\fsw";
+            watcher.Path = @"C:\fsw";
 
             Console.WriteLine("Chemin surveillé : " + watcher.Path);
             
             // Filtres d'observation du watcher
-            watcher.NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.DirectoryName | NotifyFilters.Security.HasFlag(FlagsAttribute.;
+            watcher.NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite | NotifyFilters.FileName | NotifyFilters.DirectoryName ;
 
             // Inclusion des sous-dossiers
             watcher.IncludeSubdirectories = true;
@@ -45,7 +41,7 @@ namespace logsHandler
             watcher.EnableRaisingEvents = true;
 
             Console.WriteLine("Appuyez sur \'q\' puis entrée pour quitter l'application");
-            while (Console.Read() != 'q') ;
+            //while (Console.Read() != 'q') ;
         }
 
         private static void OnStateChange(object source, FileSystemEventArgs e)
