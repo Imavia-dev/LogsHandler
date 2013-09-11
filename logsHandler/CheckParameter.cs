@@ -3,26 +3,27 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO; 
 
 namespace logsHandler
 {
     static class CheckParameter
     {
-        public static bool enableHttp;
-        public static string httpcontext;
         public static string watchDirectory;
+        public static bool includeSubdirectories;
+        public static string extensionFilter;
 
-        public static void checkArguments(string[] args)
+        public static bool checkArguments(string[] args)
         {
             // Verification du nombre d'arguments
-
+            bool error = true;
 
             if (args.Length < 3)
             {
                 Console.WriteLine("logsHandler prise en main rapide");
-                Console.WriteLine("Pour activer le support de requette http utilisez l'option http:true|false");
-                Console.WriteLine("Pour définir le contexte http utilisez l'option httpcontext:{Nom du contexte}");
-                Console.WriteLine("Pour activer la surveillance d'un répertoire de log utilisez l'option watch:{Chemin du dossier}");
+                Console.WriteLine("Pour activer la surveillance d'un répertoire de log utilisez l'option path:{Chemin du dossier}");
+                Console.WriteLine("Pour activer la surveillance des sous dossiers utilisez l'option includesubdirectories:[true|false]");
+                Console.WriteLine("Filtre des extensions filter:[*.{extension du fichier}]");
             }
             else
             {
@@ -42,6 +43,7 @@ namespace logsHandler
                     if (argumentIndex == -1)
                     {
                         Console.Write("Les options doivent s'écrirent sous la forme de \r\n [nom de l'otion]:[Valeur du paramètre] ");
+
                         break;
                     }
                     else
@@ -54,36 +56,60 @@ namespace logsHandler
 
                         switch (optionName)
                         {
-                            case "http":
-                                if (optionValue == "true")
-                                {
-                                    enableHttp = true;
-                                }
-                                else if (optionValue == "false")
-                                {
-                                    enableHttp = false;
-                                }
-                                else
-                                {
-                                    Console.Write("La valeur {0} est invalide", optionValue);
-                                    break;
-                                }
-                                break;
+                         
+                            case "path" :
 
+                                if (!Directory.Exists(optionValue))
+                                {
+                                    error=true; 
+                                     Console.WriteLine("le chemin {0} n'existe pas ", optionValue);
+                                } else 
+                                {
+                                    watchDirectory=optionValue;
+                                }
+                              break ; 
 
-                            default:
-                                break;
+                            case "includesubdirectories" :
+
+                                if (optionValue=="true") {
+                                    includeSubdirectories = true; 
+                               }else if (optionValue=="false") 
+                                {
+                                    includeSubdirectories = true; 
+                                }
+                               else
+                                {
+                                    error = true;
+                                    Console.WriteLine("l'option {0} n'est pas une option valide pour la commande  includesubdirectories ", optionValue);
+                                }
+                           break;
+
+                           case "filter":
+
+                           if (!optionValue.Contains("*."))
+                           {
+                               error = true;
+                               Console.WriteLine("Le filtre de fichier {0} n'est pas valide ", optionValue);
+                           }
+                           else
+                           {
+                               extensionFilter = optionValue;
+                           }
+                           break; 
+
+                           default :
+                           error = true;
+                           Console.WriteLine("l'option {0} n'est pas valide ", optionName);
+                           break; 
+
+                         
                         }
                     }
-
-
                 }
-
-
-
             }
+
+            return error; 
+
         }
-
-
     }
 }
