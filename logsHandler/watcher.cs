@@ -30,7 +30,7 @@ namespace logsHandler
             watcher.IncludeSubdirectories = true;
 
             // Type de fichier a rechercher
-            watcher.Filter = "*.xml";
+            watcher.Filter = "*.*";
 
             Console.WriteLine("Type de fichiers surveillés : " + watcher.Filter);
 
