@@ -24,13 +24,20 @@ namespace logsHandler
         {
             Console.WriteLine("nombre de fichier à traites {0}", fileToSend.Length);
 
-            if (fileToSend.Length > 0)
+            if (fileToSend.Length > 0 && _index<fileToSend.Length)
             {
                 string fileInProgress = fileToSend[_index];
 
                 Console.WriteLine("Traitement du fichier {0}", fileToSend[_index]);
                 XmlDocument doc = new XmlDocument();
                 doc.Load(fileInProgress);
+                // Recuperation du sender 
+                XmlNodeList players = doc.GetElementsByTagName("Player");
+
+                XmlNode player = players[0];
+                string emetteur = player.Attributes["Emetteur"].Value ;
+                Console.WriteLine("emetteur du fichier {0}", emetteur);
+
                 Console.WriteLine("Initialisation  de la requète ", fileToSend[_index]);
                 //Console.WriteLine("Fichier : " + e.FullPath + " " + e.ChangeType);
                 httpPostRequest request = new httpPostRequest();
@@ -39,7 +46,7 @@ namespace logsHandler
                 string checksum = request.calculateMd5Checksum(xmldata);
 
 
-                request.url = "http://srvweb/claroline/web/app_dev.php/imavia_tracking/logshome";
+                request.url = CheckParameter.url;
                 // On remplit le tableau de parametre 
                 //Nom du 1er paramètre
                 request.parametersName.Add("checksum");
@@ -47,6 +54,7 @@ namespace logsHandler
                 request.parametersName.Add("xmlData");
                 // Nom du 3ième Paramètre
                 request.parametersName.Add("logType");
+                request.parametersName.Add("emetteur");
 
                 // Remplissage du tableau des valeurs de la requête 
                 // Première Valeur (checksum)
@@ -54,11 +62,12 @@ namespace logsHandler
                 // Deuxiemme valeur (chaine de données xml)
                 request.parametersValue.Add(xmldata);
                 request.parametersValue.Add("Gameplay");
+                request.parametersValue.Add(emetteur);
                 //envoi de la requete 
                 request.sendPostHttpRequest();
                 Console.WriteLine("donnee envoyées...");
                 // Recuperation de la valeur du statusCode de la reponse
-
+                Console.WriteLine("Status Code {0}", request.statusCode);
                 if (request.statusCode == "OK")
                 {
 
@@ -69,7 +78,7 @@ namespace logsHandler
                     catch (IOException ex)
                     {
                         Console.WriteLine(ex.Message);
-                        throw;
+
                     }
                     //Supression du fichier 
                 }
@@ -96,13 +105,19 @@ namespace logsHandler
 
                 }
 
-                Console.WriteLine(ParseXmlResponse(request.stringResponse));
+                Console.WriteLine(request.stringResponse);
                 request.Dispose();
                 while (_index < fileToSend.Length)
                 {
                     _index++;
                     handleRequestProcess();
                 }
+
+
+            } else
+            {
+               return true ;  
+
             }
             return true; 
 

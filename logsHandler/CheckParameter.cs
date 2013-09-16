@@ -10,20 +10,21 @@ namespace logsHandler
     static class CheckParameter
     {
         public static string watchDirectory;
-        public static bool includeSubdirectories;
+        public static string url;
         public static string extensionFilter;
 
         public static bool checkArguments(string[] args)
         {
             // Verification du nombre d'arguments
-            bool error = true;
+            bool error = false ;
 
             if (args.Length < 3)
             {
                 Console.WriteLine("logsHandler prise en main rapide");
                 Console.WriteLine("Pour activer la surveillance d'un répertoire de log utilisez l'option path:{Chemin du dossier}");
-                Console.WriteLine("Pour activer la surveillance des sous dossiers utilisez l'option includesubdirectories:[true|false]");
                 Console.WriteLine("Filtre des extensions filter:[*.{extension du fichier}]");
+                Console.WriteLine("url de destination des fichier url:{route}");
+                error = true;
             }
             else
             {
@@ -69,18 +70,15 @@ namespace logsHandler
                                 }
                               break ; 
 
-                            case "includesubdirectories" :
-
-                                if (optionValue=="true") {
-                                    includeSubdirectories = true; 
-                               }else if (optionValue=="false") 
+                            case "url" :
+                                if (optionValue.Length>1)
                                 {
-                                    includeSubdirectories = true; 
+                                    url = optionValue; 
                                 }
                                else
                                 {
                                     error = true;
-                                    Console.WriteLine("l'option {0} n'est pas une option valide pour la commande  includesubdirectories ", optionValue);
+                                    Console.WriteLine("l'option {0} n'est pas une route valide ", optionValue);
                                 }
                            break;
 
