@@ -13,7 +13,9 @@ namespace logsHandler
     {
         StringBuilder errorBuffer = new StringBuilder();
         public string[] fileToSend;
-        private int _index = 0; 
+        private int _index = 0;
+        private string _emetteur;
+        private bool sendRequest=false; 
 
         public StackHandler(string[] files)
         {
@@ -32,81 +34,92 @@ namespace logsHandler
                 XmlDocument doc = new XmlDocument();
                 doc.Load(fileInProgress);
                 // Recuperation du sender 
-                XmlNodeList players = doc.GetElementsByTagName("Player");
-
-                XmlNode player = players[0];
-                string emetteur = player.Attributes["Emetteur"].Value ;
-                Console.WriteLine("emetteur du fichier {0}", emetteur);
-
-                Console.WriteLine("Initialisation  de la requète ", fileToSend[_index]);
-                //Console.WriteLine("Fichier : " + e.FullPath + " " + e.ChangeType);
-                httpPostRequest request = new httpPostRequest();
-                string xmldata = doc.DocumentElement.OuterXml;
-                Console.WriteLine("contenu du fichier xml chargé {0}", xmldata);
-                string checksum = request.calculateMd5Checksum(xmldata);
-
-
-                request.url = CheckParameter.url;
-                // On remplit le tableau de parametre 
-                //Nom du 1er paramètre
-                request.parametersName.Add("checksum");
-                //Nom du 2ieme paramètre
-                request.parametersName.Add("xmlData");
-                // Nom du 3ième Paramètre
-                request.parametersName.Add("logType");
-                request.parametersName.Add("emetteur");
-
-                // Remplissage du tableau des valeurs de la requête 
-                // Première Valeur (checksum)
-                request.parametersValue.Add(checksum.ToLower());
-                // Deuxiemme valeur (chaine de données xml)
-                request.parametersValue.Add(xmldata);
-                request.parametersValue.Add("Gameplay");
-                request.parametersValue.Add(emetteur);
-                //envoi de la requete 
-                request.sendPostHttpRequest();
-                Console.WriteLine("donnee envoyées...");
-                // Recuperation de la valeur du statusCode de la reponse
-                Console.WriteLine("Status Code {0}", request.statusCode);
-                if (request.statusCode == "OK")
+                try
                 {
-
-                    try
-                    {
-                        File.Delete(fileInProgress);
-                    }
-                    catch (IOException ex)
-                    {
-                        Console.WriteLine(ex.Message);
-
-                    }
-                    //Supression du fichier 
+                    XmlNodeList players = doc.GetElementsByTagName("Player");
+                    XmlNode player = players[0];
+                    _emetteur = player.Attributes["emetteur"].Value;
+                    Console.WriteLine("emetteur du fichier {0}", _emetteur);
+                    sendRequest = true;
                 }
-                else
+                catch (Exception)
                 {
-                    string decodedStringresponse = ParseXmlResponse(request.stringResponse);
-                    errorBuffer.AppendLine(decodedStringresponse);
-                    //Chemin de l'execution de l'application
-                    Console.WriteLine("chemin de l'application", System.Reflection.Assembly.GetExecutingAssembly().Location);
-                    string path = System.Reflection.Assembly.GetExecutingAssembly().Location;
-                    string logFolderPath = path + "\\logs\\";
-                    Console.WriteLine("dossier des logs {0}", logFolderPath);
-                    string logFileName = "logs.txt";
-                    Console.WriteLine("fichiers des logs {0}", logFileName);
+                    Console.WriteLine("Erreur Impossible de determiner le sender");
+                }
+               
 
-                    if (!Directory.Exists(logFolderPath))
+                if (sendRequest)
+                {
+                    Console.WriteLine("Initialisation  de la requète ", fileToSend[_index]);
+                    //Console.WriteLine("Fichier : " + e.FullPath + " " + e.ChangeType);
+                    httpPostRequest request = new httpPostRequest();
+                    string xmldata = doc.DocumentElement.OuterXml;
+                    Console.WriteLine("contenu du fichier xml chargé {0}", xmldata);
+                    string checksum = request.calculateMd5Checksum(xmldata);
+
+
+                    request.url = CheckParameter.url;
+                    // On remplit le tableau de parametre 
+                    //Nom du 1er paramètre
+                    request.parametersName.Add("checksum");
+                    //Nom du 2ieme paramètre
+                    request.parametersName.Add("xmlData");
+                    // Nom du 3ième Paramètre
+                    request.parametersName.Add("logType");
+                    request.parametersName.Add("emetteur");
+
+                    // Remplissage du tableau des valeurs de la requête 
+                    // Première Valeur (checksum)
+                    request.parametersValue.Add(checksum.ToLower());
+                    // Deuxiemme valeur (chaine de données xml)
+                    request.parametersValue.Add(xmldata);
+                    request.parametersValue.Add("Gameplay");
+                    request.parametersValue.Add(_emetteur);
+                    //envoi de la requete 
+                    request.sendPostHttpRequest();
+                    Console.WriteLine("donnee envoyées...");
+                    // Recuperation de la valeur du statusCode de la reponse
+                    Console.WriteLine("Status Code {0}", request.statusCode);
+                    if (request.statusCode == "OK")
                     {
-                        Directory.CreateDirectory(logFolderPath);
+
+                        try
+                        {
+                            File.Delete(fileInProgress);
+                        }
+                        catch (IOException ex)
+                        {
+                            Console.WriteLine(ex.Message);
+
+                        }
+                        //Supression du fichier 
+                    }
+                    else
+                    {
+                        string decodedStringresponse = ParseXmlResponse(request.stringResponse);
+                        errorBuffer.AppendLine(decodedStringresponse);
+                        //Chemin de l'execution de l'application
+                        Console.WriteLine("chemin de l'application", System.Reflection.Assembly.GetExecutingAssembly().Location);
+                        string path = System.Reflection.Assembly.GetExecutingAssembly().Location;
+                        string logFolderPath = path + "\\logs\\";
+                        Console.WriteLine("dossier des logs {0}", logFolderPath);
+                        string logFileName = "logs.txt";
+                        Console.WriteLine("fichiers des logs {0}", logFileName);
+
+                        if (!Directory.Exists(logFolderPath))
+                        {
+                            Directory.CreateDirectory(logFolderPath);
+                        }
+
+                        StreamWriter LogsManager = File.CreateText(logFolderPath + logFileName);
+                        LogsManager.Write(errorBuffer.ToString());
+                        LogsManager.Close();
+
                     }
 
-                    StreamWriter LogsManager = File.CreateText(logFolderPath + logFileName);
-                    LogsManager.Write(errorBuffer.ToString());
-                    LogsManager.Close();
-
+                    Console.WriteLine(request.stringResponse);
+                    request.Dispose();
                 }
-
-                Console.WriteLine(request.stringResponse);
-                request.Dispose();
                 while (_index < fileToSend.Length)
                 {
                     _index++;
@@ -120,7 +133,7 @@ namespace logsHandler
 
             }
             return true; 
-
+    
         }
          
         string ParseXmlResponse(string response)
