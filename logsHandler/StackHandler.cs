@@ -38,7 +38,7 @@ namespace logsHandler
                 {
                     XmlNodeList players = doc.GetElementsByTagName("Player");
                     XmlNode player = players[0];
-                    _emetteur = player.Attributes["emetteur"].Value;
+                    _emetteur = player.Attributes["Emetteur"].Value;
                     Console.WriteLine("emetteur du fichier {0}", _emetteur);
                     sendRequest = true;
                 }
